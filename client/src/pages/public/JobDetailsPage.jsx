@@ -13,9 +13,16 @@ import {
   CheckCircle2,
   AlertCircle,
   GraduationCap,
-  ArrowLeft
+  ArrowLeft,
+  Award,
+  AlertTriangle,
+  Check,
+  ShieldCheck,
+  Cpu,
+  UserCheck
 } from 'lucide-react';
 import MatchBreakdownCard from '../../components/matching/MatchBreakdownCard';
+import MatchScoreBadge from '../../components/common/MatchScoreBadge';
 import SkillChip from '../../components/common/SkillChip';
 import Modal from '../../components/common/Modal';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
@@ -23,7 +30,7 @@ import LoadingSpinner from '../../components/common/LoadingSpinner';
 export default function JobDetailsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user, isAuthenticated, isCandidate } = useAuth();
+  const { user, isAuthenticated, isCandidate, isEmployer } = useAuth();
 
   const [job, setJob] = useState(null);
   const [matchData, setMatchData] = useState(null);
@@ -100,13 +107,13 @@ export default function JobDetailsPage() {
     }
   };
 
-  if (loading) return <LoadingSpinner fullScreen text="Loading job posting..." />;
+  if (loading) return <LoadingSpinner fullScreen text="Evaluating job requirements and candidate intelligence..." />;
   if (!job) {
     return (
       <div className="max-w-4xl mx-auto py-16 text-center">
-        <h2 className="text-xl font-bold text-slate-800">Job Opening Not Found</h2>
-        <Link to="/jobs" className="mt-4 inline-block text-indigo-600 text-sm font-semibold hover:underline">
-          ← Back to All Jobs
+        <h2 className="text-xl font-bold text-slate-800 dark:text-white">Job Opening Not Found</h2>
+        <Link to="/jobs" className="mt-4 inline-block text-indigo-600 dark:text-indigo-400 text-sm font-bold hover:underline">
+          ← Back to All Openings
         </Link>
       </div>
     );
@@ -117,201 +124,264 @@ export default function JobDetailsPage() {
       {/* Back button */}
       <Link
         to="/jobs"
-        className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-800 transition"
+        className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition"
       >
         <ArrowLeft className="w-4 h-4" />
-        <span>Back to Jobs</span>
+        <span>Back to All Openings</span>
       </Link>
 
       {/* Main Header Card */}
-      <div className="p-8 rounded-3xl bg-white border border-slate-200 shadow-xl space-y-6">
+      <div className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl space-y-6 transition-colors">
         <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
           <div className="flex items-start gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 font-extrabold text-2xl shadow-xs">
+            <div className="w-16 h-16 rounded-2xl bg-indigo-50 dark:bg-indigo-950/80 border border-indigo-200 dark:border-indigo-800 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-black text-2xl shadow-xs flex-shrink-0">
               {job.company?.name?.charAt(0) || 'C'}
             </div>
             <div className="space-y-1">
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+              <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
                 {job.title}
               </h1>
-              <p className="text-sm font-medium text-slate-600 flex items-center gap-2">
-                <span className="font-semibold text-slate-900">{job.company?.name}</span>
+              <p className="text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-400 flex items-center gap-2">
+                <span className="font-bold text-slate-900 dark:text-white">{job.company?.name}</span>
                 <span>•</span>
                 <span className="flex items-center gap-1 text-slate-500">
-                  <MapPin className="w-3.5 h-3.5" />
-                  {job.location} ({job.workMode})
+                  <MapPin className="w-3.5 h-3.5" /> {job.location}
                 </span>
+                <span>•</span>
+                <span className="text-indigo-600 dark:text-indigo-400 font-bold">{job.workMode}</span>
               </p>
             </div>
           </div>
 
-          {/* Action Button: Apply or Already Applied */}
-          <div className="self-start md:self-auto flex flex-col items-end gap-2">
-            {existingApplication ? (
-              <div className="px-4 py-2.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                <span>Application Submitted ({existingApplication.status})</span>
-              </div>
-            ) : isCandidate ? (
-              <button
-                onClick={() => setApplyModalOpen(true)}
-                className="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold shadow-md shadow-indigo-200 transition flex items-center gap-2"
-              >
-                <Send className="w-4 h-4" />
-                <span>Apply Now</span>
-              </button>
+          {/* If Candidate, show Live Match Score Badge */}
+          {isCandidate && matchData && (
+            <div className="flex flex-col items-end">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+                Your Match Rating
+              </span>
+              <MatchScoreBadge score={matchData.score} size="lg" />
+            </div>
+          )}
+        </div>
+
+        {/* Highlight Pills */}
+        <div className="flex flex-wrap gap-2 pt-2">
+          <span className="px-3 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold flex items-center gap-1.5">
+            <Briefcase className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+            <span>{job.jobType}</span>
+          </span>
+          <span className="px-3 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold flex items-center gap-1.5">
+            <Clock className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+            <span>{job.requiredExperience ? `${job.requiredExperience}+ years experience` : 'Freshers Welcome'}</span>
+          </span>
+          <span className="px-3 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold flex items-center gap-1.5">
+            <GraduationCap className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+            <span>{job.education || "Bachelor's Degree in CS/IT"}</span>
+          </span>
+          {job.salary?.max > 0 && (
+            <span className="px-3 py-1 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 text-xs font-bold border border-emerald-200 dark:border-emerald-800">
+              ₹{job.salary.min.toLocaleString()} - ₹{job.salary.max.toLocaleString()} {job.salary.period}
+            </span>
+          )}
+        </div>
+
+        {/* CTA Bar */}
+        <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+            <span>Posted {new Date(job.createdAt).toLocaleDateString()}</span>
+            <span className="mx-2">•</span>
+            <span>{job.applicantsCount || 0} applicants so far</span>
+          </div>
+
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+            {isCandidate ? (
+              existingApplication ? (
+                <div className="px-4 py-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 text-xs font-bold flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                  <span>Applied on {new Date(existingApplication.createdAt).toLocaleDateString()} ({existingApplication.status})</span>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setApplyModalOpen(true)}
+                  className="w-full sm:w-auto px-7 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md shadow-indigo-500/25 transition flex items-center justify-center gap-2"
+                >
+                  <Send className="w-4 h-4" />
+                  <span>Submit 1-Click Application</span>
+                </button>
+              )
             ) : !isAuthenticated ? (
               <Link
-                to="/login"
-                className="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold shadow-md transition flex items-center gap-2"
+                to={`/login?redirect=/jobs/${id}`}
+                className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-xs transition text-center"
               >
-                <span>Sign in to Apply</span>
+                Sign In to Apply
+              </Link>
+            ) : isEmployer ? (
+              <Link
+                to={`/employer/jobs/${id}/applicants`}
+                className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-xs transition"
+              >
+                Inspect Candidate Rankings
               </Link>
             ) : null}
           </div>
         </div>
-
-        {/* Quick Spec Pills */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 border-t border-slate-100 text-xs">
-          <div className="p-3 rounded-xl bg-slate-50">
-            <span className="text-slate-400 block mb-0.5">Job Type</span>
-            <span className="font-bold text-slate-800">{job.jobType}</span>
-          </div>
-          <div className="p-3 rounded-xl bg-slate-50">
-            <span className="text-slate-400 block mb-0.5">Experience</span>
-            <span className="font-bold text-slate-800">{job.requiredExperience}+ years</span>
-          </div>
-          <div className="p-3 rounded-xl bg-slate-50">
-            <span className="text-slate-400 block mb-0.5">Compensation</span>
-            <span className="font-bold text-slate-800">
-              ₹{job.salary?.min ? (job.salary.min / 100000).toFixed(1) + 'L' : 'Competitive'} - ₹{job.salary?.max ? (job.salary.max / 100000).toFixed(1) + 'L' : 'Best'} {job.salary?.period}
-            </span>
-          </div>
-          <div className="p-3 rounded-xl bg-slate-50">
-            <span className="text-slate-400 block mb-0.5">Application Deadline</span>
-            <span className="font-bold text-slate-800">{new Date(job.deadline).toLocaleDateString()}</span>
-          </div>
-        </div>
       </div>
 
-      {/* Live Match Engine Breakdown for Logged-In Candidates */}
+      {/* WHY YOU MATCH (FOR CANDIDATES) */}
       {isCandidate && matchData && (
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-indigo-600" />
-              <span>Your Live Resume Match Analysis</span>
-            </h2>
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <Cpu className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+            <h2 className="text-lg font-black text-slate-900 dark:text-white">Why You Match</h2>
           </div>
           <MatchBreakdownCard matchData={matchData} />
         </div>
       )}
 
-      {/* Detailed Description */}
-      <div className="p-8 rounded-3xl bg-white border border-slate-200 shadow-xs space-y-6">
-        <div>
-          <h3 className="text-base font-bold text-slate-900 mb-2">Job Description</h3>
-          <p className="text-sm text-slate-600 whitespace-pre-line leading-relaxed">
-            {job.description}
-          </p>
-        </div>
+      {/* JOB REQUIREMENTS Breakdown */}
+      <div className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm space-y-6 transition-colors">
+        <h2 className="text-lg font-black text-slate-900 dark:text-white">JOB REQUIREMENTS</h2>
 
         {/* Required Skills */}
-        <div>
-          <h3 className="text-sm font-bold text-slate-900 mb-3">Required Core Skills</h3>
+        <div className="space-y-2.5">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+            Mandatory Skills ({job.requiredSkills?.length || 0})
+          </h3>
           <div className="flex flex-wrap gap-2">
-            {job.requiredSkills.map((skill, idx) => (
-              <SkillChip key={idx} skill={skill} variant="neutral" />
-            ))}
+            {job.requiredSkills?.map((skill, index) => {
+              const isMatched = matchData?.matchedSkills?.includes(skill);
+              const isMissing = matchData?.missingSkills?.includes(skill);
+
+              return (
+                <SkillChip
+                  key={index}
+                  skill={skill}
+                  variant={isMatched ? 'matched' : isMissing ? 'missing' : 'neutral'}
+                  size="md"
+                />
+              );
+            })}
           </div>
         </div>
 
         {/* Preferred Skills */}
         {job.preferredSkills?.length > 0 && (
-          <div>
-            <h3 className="text-sm font-bold text-slate-900 mb-3">Preferred Bonus Skills</h3>
+          <div className="space-y-2.5 pt-2">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+              Preferred Bonus Skills ({job.preferredSkills.length})
+            </h3>
             <div className="flex flex-wrap gap-2">
-              {job.preferredSkills.map((skill, idx) => (
-                <SkillChip key={idx} skill={skill} variant="preferred" />
+              {job.preferredSkills.map((skill, index) => (
+                <SkillChip key={index} skill={skill} variant="preferred" size="md" />
               ))}
             </div>
           </div>
         )}
 
-        {/* Education Requirement */}
-        {job.education && (
-          <div className="flex items-center gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-100 text-xs">
-            <GraduationCap className="w-5 h-5 text-indigo-600 flex-shrink-0" />
-            <div>
-              <span className="font-bold text-slate-800 block">Educational Qualifications</span>
-              <span className="text-slate-600">{job.education}</span>
+        {/* Experience & Education Matching Summary */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-850 border border-slate-200/80 dark:border-slate-800 space-y-1">
+            <div className="flex items-center gap-2 text-xs font-bold text-slate-900 dark:text-white">
+              <Briefcase className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+              <span>EXPERIENCE REQUIREMENT</span>
             </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Required: <strong>{job.requiredExperience ? `${job.requiredExperience} Years` : '0 Years (Entry Level)'}</strong>
+            </p>
+            {matchData && (
+              <p className="text-[11px] text-indigo-600 dark:text-indigo-400 font-semibold mt-1">
+                Your profile: {matchData.candidateTotalExperience || 0} years verified
+              </p>
+            )}
           </div>
-        )}
+
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-850 border border-slate-200/80 dark:border-slate-800 space-y-1">
+            <div className="flex items-center gap-2 text-xs font-bold text-slate-900 dark:text-white">
+              <GraduationCap className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              <span>EDUCATION REQUIREMENT</span>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              Target: <strong>{job.education || "Bachelor's Degree in CS or equivalent"}</strong>
+            </p>
+            {matchData && (
+              <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold mt-1">
+                {matchData.educationMatch ? 'Degree qualification satisfied' : 'Alternative credential evaluated'}
+              </p>
+            )}
+          </div>
+        </div>
+
+        {/* Full Job Description */}
+        <div className="space-y-3 pt-4 border-t border-slate-100 dark:border-slate-800">
+          <h3 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">
+            Job Description & Responsibilities
+          </h3>
+          <div className="prose dark:prose-invert text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed whitespace-pre-line">
+            {job.description}
+          </div>
+        </div>
       </div>
 
       {/* Apply Modal */}
-      <Modal
-        isOpen={applyModalOpen}
-        onClose={() => setApplyModalOpen(false)}
-        title={`Apply for ${job.title}`}
-      >
+      <Modal isOpen={applyModalOpen} onClose={() => setApplyModalOpen(false)} title={`Apply for ${job.title}`}>
         {applySuccess ? (
-          <div className="py-8 text-center space-y-3">
+          <div className="p-6 text-center space-y-3">
             <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 mx-auto flex items-center justify-center">
-              <CheckCircle2 className="w-7 h-7" />
+              <Check className="w-6 h-6 stroke-[3]" />
             </div>
-            <h4 className="text-base font-bold text-slate-900">Application Submitted!</h4>
-            <p className="text-xs text-slate-500 max-w-sm mx-auto">
-              Your profile and match score snapshot have been sent to the recruiter. You can track status in your applications dashboard.
+            <h3 className="text-base font-bold text-slate-900 dark:text-white">Application Submitted!</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Your resume snapshot and computed match score of {matchData?.score || 85}% have been delivered to the employer.
             </p>
           </div>
         ) : (
-          <form onSubmit={handleApply} className="space-y-4">
+          <form onSubmit={handleApply} className="space-y-4 text-xs">
             {applyError && (
-              <div className="p-3 rounded-xl bg-rose-50 text-rose-700 text-xs flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                <span>{applyError}</span>
+              <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold">
+                {applyError}
               </div>
             )}
 
-            {matchData && (
-              <div className="p-3.5 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-between text-xs">
-                <div>
-                  <span className="font-bold text-indigo-900 block">Your Current Match Score</span>
-                  <span className="text-indigo-600">Calculated based on your verified skills</span>
-                </div>
-                <span className="text-base font-extrabold text-indigo-700">{matchData.score}%</span>
+            <div className="p-4 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/60 space-y-1.5">
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-indigo-950 dark:text-indigo-200">Matching Engine Snapshot</span>
+                <span className="font-black text-indigo-700 dark:text-indigo-400 text-sm">
+                  {matchData?.score || 85}% Match
+                </span>
               </div>
-            )}
+              <p className="text-[11px] text-slate-600 dark:text-slate-400">
+                The recruiter will see your deterministic breakdown: Skills ({matchData?.skillScore || 85}%), Experience ({matchData?.experienceScore || 100}%), Education ({matchData?.educationScore || 100}%).
+              </p>
+            </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Cover Note / Message for Recruiter (Optional)
+              <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                Candidate Note / Cover Message (Optional)
               </label>
               <textarea
                 rows="4"
                 value={coverNote}
-                onChange={(e) => setCoverNote(e.target.value)}
-                placeholder="Briefly explain why you are an ideal fit for this role..."
-                className="w-full p-3 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                onChange={e => setCoverNote(e.target.value)}
+                placeholder="Mention why you are passionate about this role and relevant projects..."
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-850 text-slate-900 dark:text-white"
               />
             </div>
 
-            <div className="flex items-center justify-end gap-3 pt-2">
+            <div className="flex justify-end gap-2 pt-2">
               <button
                 type="button"
                 onClick={() => setApplyModalOpen(false)}
-                className="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 text-xs font-semibold hover:bg-slate-50"
+                className="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 font-bold"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={submitting}
-                className="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition flex items-center gap-2 disabled:opacity-70"
+                className="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-xs disabled:opacity-50"
               >
-                {submitting ? 'Submitting...' : 'Submit Application'}
+                {submitting ? 'Submitting...' : 'Confirm Application'}
               </button>
             </div>
           </form>

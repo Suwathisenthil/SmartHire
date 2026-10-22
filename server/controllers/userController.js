@@ -1,4 +1,6 @@
 const User = require('../models/User');
+const fs = require('fs');
+const path = require('path');
 const { normalizeSkillList } = require('../services/matchingService');
 
 /**
@@ -241,4 +243,29 @@ exports.deleteCertification = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+};
+
+
+/**
+ * @desc Upload candidate profile photo
+ * @route POST /api/users/profile/photo
+ * @access Private (Candidate)
+ */
+exports.uploadProfilePhoto = async (req, res, next) => {
+  try {
+    if (!req.file) return res.status(400).json({ success: false, message: 'Please choose a profile photo.' });
+    const user = await User.findById(req.user._id);
+    if (!user) return res.status(404).json({ success: false, message: 'User not found.' });
+
+    if (user.profileImage && user.profileImage.startsWith('/uploads/profiles/')) {
+      const oldPath = path.join(__dirname, '..', user.profileImage.replace(/^\//, ''));
+      if (fs.existsSync(oldPath)) {
+        try { fs.unlinkSync(oldPath); } catch (_) {}
+      }
+    }
+
+    user.profileImage = `/uploads/profiles/${req.file.filename}`;
+    await user.save();
+    res.json({ success: true, message: 'Profile photo updated.', data: { profileImage: user.profileImage, user } });
+  } catch (error) { next(error); }
 };

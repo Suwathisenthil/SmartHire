@@ -6,3 +6,9 @@ dist/
 build/
 .DS_Store
 *.log
+
+server/uploads/
+.env
+server/.env
+client/.env
+client/.env.local

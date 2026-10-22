@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { Briefcase, User, Mail, Lock, Building, MapPin, ArrowRight, AlertCircle } from 'lucide-react';
+import { Briefcase, User, Mail, Lock, Building, MapPin, ArrowRight, AlertCircle, Cpu } from 'lucide-react';
 
 export default function RegisterPage() {
   const { register } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
-  const [role, setRole] = useState('candidate'); // 'candidate' | 'employer'
+  const [role, setRole] = useState(searchParams.get('role') === 'employer' ? 'employer' : 'candidate');
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -36,7 +37,7 @@ export default function RegisterPage() {
       if (user.role === 'employer') {
         navigate('/employer/dashboard');
       } else {
-        navigate('/candidate/resume'); // Encourage candidate to upload resume immediately!
+        navigate('/candidate/resume');
       }
     } catch (err) {
       setError(err.message || 'Registration failed. Please check your information.');
@@ -46,35 +47,35 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-[80vh] flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="min-h-[85vh] flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
-        <Link to="/" className="inline-flex items-center gap-2 mb-4 group">
-          <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-md shadow-indigo-200 group-hover:scale-105 transition">
-            <Briefcase className="w-5 h-5" />
+        <Link to="/" className="inline-flex items-center gap-2.5 mb-4 group">
+          <div className="w-10 h-10 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shadow-md shadow-indigo-500/20 group-hover:scale-105 transition">
+            <Cpu className="w-5 h-5 text-indigo-100" />
           </div>
-          <span className="text-2xl font-extrabold text-slate-900">
-            Smart<span className="text-indigo-600">Hire</span>
+          <span className="text-2xl font-black text-slate-900 dark:text-white">
+            Smart<span className="text-indigo-600 dark:text-indigo-400">Hire</span>
           </span>
         </Link>
-        <h2 className="text-2xl font-bold tracking-tight text-slate-900">
+        <h2 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
           Create your account
         </h2>
-        <p className="text-xs text-slate-500 mt-1">
-          Join thousands of applicants and companies on SmartHire
+        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+          Join candidates and companies on the Recruitment Intelligence Platform
         </p>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-lg px-4">
-        <div className="bg-white py-8 px-6 sm:px-8 rounded-3xl border border-slate-200 shadow-xl space-y-6">
+        <div className="bg-white dark:bg-slate-900 py-8 px-6 sm:px-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl space-y-6 transition-colors">
           {/* Role Selector Tabs */}
-          <div className="grid grid-cols-2 p-1 rounded-2xl bg-slate-100 gap-1 text-xs font-semibold">
+          <div className="grid grid-cols-2 p-1.5 rounded-2xl bg-slate-100 dark:bg-slate-800 gap-1 text-xs font-bold">
             <button
               type="button"
               onClick={() => setRole('candidate')}
               className={`flex items-center justify-center gap-2 py-2.5 rounded-xl transition ${
                 role === 'candidate'
-                  ? 'bg-white text-indigo-600 shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               <User className="w-4 h-4" />
@@ -85,8 +86,8 @@ export default function RegisterPage() {
               onClick={() => setRole('employer')}
               className={`flex items-center justify-center gap-2 py-2.5 rounded-xl transition ${
                 role === 'employer'
-                  ? 'bg-white text-indigo-600 shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               <Building className="w-4 h-4" />
@@ -95,104 +96,114 @@ export default function RegisterPage() {
           </div>
 
           {error && (
-            <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 flex-shrink-0 text-rose-600" />
+            <div className="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-900 text-rose-700 dark:text-rose-300 text-xs font-semibold flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 flex-shrink-0 text-rose-600 dark:text-rose-400" />
               <span>{error}</span>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4 text-xs">
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
+              <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">
                 Full Name
               </label>
-              <input
-                type="text"
-                required
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                placeholder={role === 'candidate' ? 'Rahul Sharma' : 'Anjali Verma'}
-                className="block w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
-              />
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                  <User className="w-4 h-4" />
+                </div>
+                <input
+                  type="text"
+                  name="name"
+                  required
+                  value={formData.name}
+                  onChange={handleChange}
+                  placeholder="e.g. Rahul Sharma"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-850 text-slate-900 dark:text-white text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                />
+              </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
+              <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">
                 Email Address
               </label>
-              <input
-                type="email"
-                required
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="name@example.com"
-                className="block w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
-              />
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                  <Mail className="w-4 h-4" />
+                </div>
+                <input
+                  type="email"
+                  name="email"
+                  required
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="you@domain.com"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-850 text-slate-900 dark:text-white text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                />
+              </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
+              <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">
                 Password
               </label>
-              <input
-                type="password"
-                required
-                name="password"
-                minLength="6"
-                value={formData.password}
-                onChange={handleChange}
-                placeholder="At least 6 characters"
-                className="block w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
-              />
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                  <Lock className="w-4 h-4" />
+                </div>
+                <input
+                  type="password"
+                  name="password"
+                  required
+                  minLength={6}
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="••••••••"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-850 text-slate-900 dark:text-white text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                />
+              </div>
             </div>
 
-            {/* Employer Specific Fields */}
+            {/* Employer Specific Company Details */}
             {role === 'employer' && (
-              <div className="space-y-4 pt-3 border-t border-slate-100">
-                <p className="text-xs font-bold text-slate-900 uppercase tracking-wider">
-                  Company Information
-                </p>
+              <div className="space-y-4 pt-2 border-t border-slate-100 dark:border-slate-800">
+                <p className="font-bold text-indigo-600 dark:text-indigo-400 text-xs">Company Details</p>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Company Name
-                  </label>
+                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Company Name</label>
                   <input
                     type="text"
-                    required
                     name="companyName"
+                    required={role === 'employer'}
                     value={formData.companyName}
                     onChange={handleChange}
-                    placeholder="Acme Tech Solutions"
-                    className="block w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+                    placeholder="e.g. TechCorp Solutions"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-850 text-slate-900 dark:text-white text-xs"
                   />
                 </div>
+
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">
-                      Industry
-                    </label>
+                    <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Industry</label>
                     <input
                       type="text"
                       name="companyIndustry"
+                      required={role === 'employer'}
                       value={formData.companyIndustry}
                       onChange={handleChange}
-                      placeholder="e.g. IT, FinTech, AI"
-                      className="block w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+                      placeholder="e.g. IT & Software"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-850 text-slate-900 dark:text-white text-xs"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">
-                      Headquarters
-                    </label>
+                    <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">Location</label>
                     <input
                       type="text"
                       name="companyLocation"
+                      required={role === 'employer'}
                       value={formData.companyLocation}
                       onChange={handleChange}
                       placeholder="e.g. Bangalore, India"
-                      className="block w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-850 text-slate-900 dark:text-white text-xs"
                     />
                   </div>
                 </div>
@@ -202,24 +213,24 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full mt-4 py-3 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold shadow-md shadow-indigo-200 transition flex items-center justify-center gap-2 disabled:opacity-70"
+              className="w-full py-3 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md shadow-indigo-500/25 transition flex items-center justify-center gap-2 disabled:opacity-50"
             >
               {loading ? (
                 <span>Creating Account...</span>
               ) : (
                 <>
-                  <span>Complete Registration</span>
+                  <span>Create Account</span>
                   <ArrowRight className="w-4 h-4" />
                 </>
               )}
             </button>
           </form>
 
-          <div className="text-center pt-2">
-            <p className="text-xs text-slate-500">
+          <div className="pt-4 border-t border-slate-100 dark:border-slate-800 text-center">
+            <p className="text-xs text-slate-500 dark:text-slate-400">
               Already have an account?{' '}
-              <Link to="/login" className="font-semibold text-indigo-600 hover:underline">
-                Sign in
+              <Link to="/login" className="font-bold text-indigo-600 dark:text-indigo-400 hover:underline">
+                Sign In
               </Link>
             </p>
           </div>

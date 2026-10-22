@@ -14,6 +14,8 @@ const matchingRoutes = require('./routes/matchingRoutes');
 const interviewRoutes = require('./routes/interviewRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const assessmentRoutes = require('./routes/assessmentRoutes');
+const learningRoutes = require('./routes/learningRoutes');
 
 const app = express();
 
@@ -50,6 +52,8 @@ app.use('/api/matching', matchingRoutes);
 app.use('/api/interviews', interviewRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/assessments', assessmentRoutes);
+app.use('/api/learning', learningRoutes);
 
 // 404 Route handler for undefined API routes
 app.use('/api/*', (req, res) => {

@@ -5,7 +5,7 @@ import Sidebar from '../components/common/Sidebar';
 
 export default function DashboardLayout() {
   return (
-    <div className="min-h-screen flex flex-col bg-slate-100/60">
+    <div className="min-h-screen flex flex-col bg-slate-100/70 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-200">
       <Navbar />
       <div className="flex-1 flex max-w-7xl w-full mx-auto">
         <div className="hidden md:block">

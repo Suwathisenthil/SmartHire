@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { NotificationProvider } from './context/NotificationContext';
+import { ThemeProvider } from './context/ThemeContext';
 
 // Layouts
 import MainLayout from './layouts/MainLayout';
@@ -26,6 +27,8 @@ import RecommendedJobsPage from './pages/candidate/RecommendedJobsPage';
 import MyApplicationsPage from './pages/candidate/MyApplicationsPage';
 import SkillGapPage from './pages/candidate/SkillGapPage';
 import CandidateInterviewsPage from './pages/candidate/CandidateInterviewsPage';
+import AssessmentsPage from './pages/candidate/AssessmentsPage';
+import LearningRoadmapPage from './pages/candidate/LearningRoadmapPage';
 
 // Employer Pages
 import EmployerDashboard from './pages/employer/EmployerDashboard';
@@ -51,72 +54,76 @@ import NotFoundPage from './pages/common/NotFoundPage';
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <AuthProvider>
-        <NotificationProvider>
-          <Routes>
-            {/* Public Routes with MainLayout */}
-            <Route element={<MainLayout />}>
-              <Route path="/" element={<LandingPage />} />
-              <Route path="/jobs" element={<PublicJobsPage />} />
-              <Route path="/jobs/:id" element={<JobDetailsPage />} />
-              <Route path="/about" element={<AboutPage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/register" element={<RegisterPage />} />
-            </Route>
-
-            {/* Candidate Portal Routes */}
-            <Route element={<ProtectedRoute allowedRoles={['candidate']} />}>
-              <Route element={<DashboardLayout />}>
-                <Route path="/candidate/dashboard" element={<CandidateDashboard />} />
-                <Route path="/candidate/profile" element={<ProfilePage />} />
-                <Route path="/candidate/resume" element={<ResumeUploadPage />} />
-                <Route path="/candidate/recommendations" element={<RecommendedJobsPage />} />
-                <Route path="/candidate/applications" element={<MyApplicationsPage />} />
-                <Route path="/candidate/skill-gap" element={<SkillGapPage />} />
-                <Route path="/candidate/interviews" element={<CandidateInterviewsPage />} />
+    <ThemeProvider>
+      <BrowserRouter>
+        <AuthProvider>
+          <NotificationProvider>
+            <Routes>
+              {/* Public Routes with MainLayout */}
+              <Route element={<MainLayout />}>
+                <Route path="/" element={<LandingPage />} />
+                <Route path="/jobs" element={<PublicJobsPage />} />
+                <Route path="/jobs/:id" element={<JobDetailsPage />} />
+                <Route path="/about" element={<AboutPage />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/register" element={<RegisterPage />} />
               </Route>
-            </Route>
 
-            {/* Employer Portal Routes */}
-            <Route element={<ProtectedRoute allowedRoles={['employer', 'admin']} />}>
-              <Route element={<DashboardLayout />}>
-                <Route path="/employer/dashboard" element={<EmployerDashboard />} />
-                <Route path="/employer/company" element={<CompanyProfilePage />} />
-                <Route path="/employer/jobs" element={<ManageJobsPage />} />
-                <Route path="/employer/jobs/create" element={<CreateJobPage />} />
-                <Route path="/employer/jobs/:id/edit" element={<EditJobPage />} />
-                <Route path="/employer/jobs/:id/applicants" element={<JobApplicantsPage />} />
-                <Route path="/employer/interviews" element={<EmployerInterviewsPage />} />
-                <Route path="/employer/analytics" element={<EmployerAnalyticsPage />} />
+              {/* Candidate Portal Routes */}
+              <Route element={<ProtectedRoute allowedRoles={['candidate']} />}>
+                <Route element={<DashboardLayout />}>
+                  <Route path="/candidate/dashboard" element={<CandidateDashboard />} />
+                  <Route path="/candidate/profile" element={<ProfilePage />} />
+                  <Route path="/candidate/resume" element={<ResumeUploadPage />} />
+                  <Route path="/candidate/recommendations" element={<RecommendedJobsPage />} />
+                  <Route path="/candidate/applications" element={<MyApplicationsPage />} />
+                  <Route path="/candidate/skill-gap" element={<SkillGapPage />} />
+                  <Route path="/candidate/learning" element={<LearningRoadmapPage />} />
+                  <Route path="/candidate/assessments" element={<AssessmentsPage />} />
+                  <Route path="/candidate/interviews" element={<CandidateInterviewsPage />} />
+                </Route>
               </Route>
-            </Route>
 
-            {/* Admin Portal Routes */}
-            <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
-              <Route element={<DashboardLayout />}>
-                <Route path="/admin/dashboard" element={<AdminDashboard />} />
-                <Route path="/admin/users" element={<AdminUsersPage />} />
-                <Route path="/admin/companies" element={<AdminCompaniesPage />} />
-                <Route path="/admin/jobs" element={<AdminJobsPage />} />
-                <Route path="/admin/applications" element={<AdminApplicationsPage />} />
-                <Route path="/admin/reports" element={<AdminDashboard />} />
+              {/* Employer Portal Routes */}
+              <Route element={<ProtectedRoute allowedRoles={['employer', 'admin']} />}>
+                <Route element={<DashboardLayout />}>
+                  <Route path="/employer/dashboard" element={<EmployerDashboard />} />
+                  <Route path="/employer/company" element={<CompanyProfilePage />} />
+                  <Route path="/employer/jobs" element={<ManageJobsPage />} />
+                  <Route path="/employer/jobs/create" element={<CreateJobPage />} />
+                  <Route path="/employer/jobs/:id/edit" element={<EditJobPage />} />
+                  <Route path="/employer/jobs/:id/applicants" element={<JobApplicantsPage />} />
+                  <Route path="/employer/interviews" element={<EmployerInterviewsPage />} />
+                  <Route path="/employer/analytics" element={<EmployerAnalyticsPage />} />
+                </Route>
               </Route>
-            </Route>
 
-            {/* Common Authenticated Routes */}
-            <Route element={<ProtectedRoute allowedRoles={['candidate', 'employer', 'admin']} />}>
-              <Route element={<DashboardLayout />}>
-                <Route path="/notifications" element={<NotificationsPage />} />
-                <Route path="/settings" element={<SettingsPage />} />
+              {/* Admin Portal Routes */}
+              <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
+                <Route element={<DashboardLayout />}>
+                  <Route path="/admin/dashboard" element={<AdminDashboard />} />
+                  <Route path="/admin/users" element={<AdminUsersPage />} />
+                  <Route path="/admin/companies" element={<AdminCompaniesPage />} />
+                  <Route path="/admin/jobs" element={<AdminJobsPage />} />
+                  <Route path="/admin/applications" element={<AdminApplicationsPage />} />
+                  <Route path="/admin/reports" element={<AdminDashboard />} />
+                </Route>
               </Route>
-            </Route>
 
-            {/* Catch-all 404 Route */}
-            <Route path="*" element={<NotFoundPage />} />
-          </Routes>
-        </NotificationProvider>
-      </AuthProvider>
-    </BrowserRouter>
+              {/* Common Authenticated Routes */}
+              <Route element={<ProtectedRoute allowedRoles={['candidate', 'employer', 'admin']} />}>
+                <Route element={<DashboardLayout />}>
+                  <Route path="/notifications" element={<NotificationsPage />} />
+                  <Route path="/settings" element={<SettingsPage />} />
+                </Route>
+              </Route>
+
+              {/* Catch-all 404 Route */}
+              <Route path="*" element={<NotFoundPage />} />
+            </Routes>
+          </NotificationProvider>
+        </AuthProvider>
+      </BrowserRouter>
+    </ThemeProvider>
   );
 }

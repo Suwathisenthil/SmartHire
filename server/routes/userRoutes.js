@@ -9,12 +9,14 @@ const {
   addEducation,
   deleteEducation,
   addCertification,
-  deleteCertification
+  deleteCertification,
+  uploadProfilePhoto
 } = require('../controllers/userController');
 const { protect, authorize } = require('../middleware/auth');
 
 router.get('/profile', protect, getProfile);
 router.put('/profile', protect, updateProfile);
+router.post('/profile/photo', protect, authorize('candidate'), require('../middleware/profileUpload').single('photo'), uploadProfilePhoto);
 router.get('/candidate/:id', protect, authorize('employer', 'admin'), getCandidateById);
 
 // Experience

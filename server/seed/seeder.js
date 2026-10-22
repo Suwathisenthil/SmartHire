@@ -10,8 +10,10 @@ const Application = require('../models/Application');
 const Interview = require('../models/Interview');
 const Notification = require('../models/Notification');
 const Skill = require('../models/Skill');
+const Assessment = require('../models/Assessment');
 
 const { seedSkills, seedUsers, seedCompanies, seedJobs } = require('./seedData');
+const { seedAssessments } = require('./assessmentData');
 const { calculateJobMatch } = require('../services/matchingService');
 
 async function runSeed() {
@@ -27,7 +29,8 @@ async function runSeed() {
       Application.deleteMany(),
       Interview.deleteMany(),
       Notification.deleteMany(),
-      Skill.deleteMany()
+      Skill.deleteMany(),
+      Assessment.deleteMany()
     ]);
 
     console.log('[Seeder] Database cleared.');
@@ -36,6 +39,10 @@ async function runSeed() {
     console.log('[Seeder] Seeding Skill dictionary...');
     await Skill.insertMany(seedSkills);
     console.log(`[Seeder] Inserted ${seedSkills.length} canonical skills.`);
+
+    console.log('[Seeder] Seeding skill assessments...');
+    await Assessment.insertMany(seedAssessments);
+    console.log(`[Seeder] Inserted ${seedAssessments.length} assessments.`);
 
     // 2. Seed Users
     console.log('[Seeder] Seeding Users...');
